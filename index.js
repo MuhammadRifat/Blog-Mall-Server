@@ -16,35 +16,34 @@ const port = 5000
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
-  const blogsCollection = client.db(`${process.env.DB_NAME}`).collection("blogs");
-  console.log("database connected");
+    const blogsCollection = client.db(`${process.env.DB_NAME}`).collection("blogs");
+    console.log("database connected");
 
-  app.get('/', (req, res) => {
-    res.send("It' Working!");
-  })
+    app.get('/', (req, res) => {
+        res.send("It' Working!");
+    })
 
-  app.post('/addPost', (req, res) => {
-    const postData = req.body;
-    blogsCollection.insertOne(postData)
-      .then(result => {
-        res.send(result.insertedCount > 0);
-      })
-  })
+    app.post('/addPost', (req, res) => {
+        const postData = req.body;
+        blogsCollection.insertOne(postData)
+            .then(result => {
+                res.send(result.insertedCount > 0);
+            })
+    })
 
-//   app.post('/allPosts', (req, res) => {
-//     const email = req.body.email;
-//     memoriesCollection.find({email: email})
-//       .toArray((err, result) => {
-//         res.send(result);
-//       })
-//   })
+    app.get('/blogs', (req, res) => {
+        blogsCollection.find({})
+            .toArray((err, result) => {
+                res.send(result);
+            })
+    })
 
-//   app.delete('/deletePost/:id', (req, res) => {
-//     memoriesCollection.deleteOne({ _id: ObjectId(req.params.id) })
-//       .then(result => {
-//         res.send(result.deletedCount > 0);
-//       })
-//   })
+    app.delete('/deleteBlog', (req, res) => {
+        blogsCollection.deleteOne({ _id: ObjectId(req.body.id) })
+            .then(result => {
+                res.send(result.deletedCount > 0);
+            })
+    })
 
 });
 
