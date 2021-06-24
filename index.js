@@ -17,6 +17,7 @@ const port = 5000
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
     const blogsCollection = client.db(`${process.env.DB_NAME}`).collection("blogs");
+    const adminCollection = client.db(`${process.env.DB_NAME}`).collection("admin");
     console.log("database connected");
 
     app.get('/', (req, res) => {
@@ -42,6 +43,15 @@ client.connect(err => {
         blogsCollection.deleteOne({ _id: ObjectId(req.body.id) })
             .then(result => {
                 res.send(result.deletedCount > 0);
+            })
+    })
+
+    // checking logged in user is admin or not
+    app.post('/isAdmin', (req, res) => {
+        const email = req.body.email;
+        adminCollection.find({ email: email })
+            .toArray((err, documents) => {
+                res.send(documents.length > 0);
             })
     })
 
