@@ -24,6 +24,7 @@ client.connect(err => {
         res.send("It' Working!");
     })
 
+    // Add blog into the database
     app.post('/addPost', (req, res) => {
         const postData = req.body;
         blogsCollection.insertOne(postData)
@@ -32,6 +33,7 @@ client.connect(err => {
             })
     })
 
+    // Load all blogs from the database
     app.get('/blogs', (req, res) => {
         blogsCollection.find({}).sort({ date: -1 })
             .toArray((err, result) => {
@@ -39,6 +41,7 @@ client.connect(err => {
             })
     })
 
+    // Load blog by id from the database
     app.get('/blog/:id', (req, res) => {
         const id = req.params.id;
         blogsCollection.findOne({ _id: ObjectId(id) })
@@ -51,6 +54,7 @@ client.connect(err => {
             })
     })
 
+    // Delete blog from the database
     app.delete('/deleteBlog', (req, res) => {
         blogsCollection.deleteOne({ _id: ObjectId(req.body.id) })
             .then(result => {
@@ -67,6 +71,7 @@ client.connect(err => {
             })
     })
 
+    // Update likes
     app.patch('/updateLikes', (req, res) => {
         const id = req.body.id;
         const likes = req.body.likes;
@@ -79,6 +84,7 @@ client.connect(err => {
             })
     });
 
+    // searching blogs
     app.post('/blogSearch', (req, res) => {
         const title = req.body.search;
         blogsCollection.find({ title: new RegExp(title, 'i') })
