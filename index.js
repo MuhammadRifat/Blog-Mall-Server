@@ -33,9 +33,21 @@ client.connect(err => {
     })
 
     app.get('/blogs', (req, res) => {
-        blogsCollection.find({})
+        blogsCollection.find({}).sort({ date: -1 })
             .toArray((err, result) => {
                 res.send(result);
+            })
+    })
+
+    app.get('/blog/:id', (req, res) => {
+        const id = req.params.id;
+        blogsCollection.findOne({ _id: ObjectId(id) })
+            .then(result => {
+                res.send(result);
+                blogsCollection.updateOne({ _id: ObjectId(id) },
+                    {
+                        $set: { views: result.views + 1 }
+                    })
             })
     })
 
@@ -52,6 +64,26 @@ client.connect(err => {
         adminCollection.find({ email: email })
             .toArray((err, documents) => {
                 res.send(documents.length > 0);
+            })
+    })
+
+    app.patch('/updateLikes', (req, res) => {
+        const id = req.body.id;
+        const likes = req.body.likes;
+        blogsCollection.updateOne({ _id: ObjectId(id) },
+            {
+                $set: { likes: likes }
+            })
+            .then(result => {
+                res.send(result.modifiedCount > 0);
+            })
+    });
+
+    app.post('/blogSearch', (req, res) => {
+        const title = req.body.search;
+        blogsCollection.find({ title: new RegExp(title, 'i') })
+            .toArray((err, documents) => {
+                res.send(documents);
             })
     })
 
